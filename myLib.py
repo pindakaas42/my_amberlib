@@ -237,17 +237,6 @@ def infileread_disang(infile):
     return infiledict
 
 
-# def infilereadin_multiple_namelists(infile):
-#     '''reads all namelists in the infile and puts each in a different dict'''
-#     namelists = dict()
-#     with open(infile, 'r') as f:
-#         for line in f:
-#             if '&cntr' in line:
-#                 namelist['&cntr'] = dict()
-#
-#     return infiledict
-
-
 def read_mtmdfile(mtmdfile):
     mtmddict1 = dict()
     mtmddict2 = dict()
@@ -278,13 +267,31 @@ def read_mtmdfile(mtmdfile):
 
 
 def read_conf_line(line):
+    '''reads a line of comma separated values like a=1,b=5,4, c=3, d=5,65, \n
+    and returns a list of strings of the form :
+        ['a=1', 'b=5,4', 'c=3', 'd=5,65']'''
     line = line.strip()
     line_commalist = line.split(',')
+    keys_values = ['']
     for l in line_commalist[::-1]:
-        if '=' not in l:
-            line_commalist[-2] += ','+line_commalist[-1]
-            line_commalist.pop()
-    return line_commalist
+        if '=' not in l and l is not '':
+            keys_values[-1] = ','+l.strip()+keys_values[-1]
+        if '=' in l:
+            keys_values[-1] = l.strip()+keys_values[-1]
+            if l != line_commalist[0]:
+                keys_values.append('')
+    return keys_values
+
+# def read_conf_file(filename):
+#     conffiledict = dict()
+#     with open(filename, 'r') as f :
+#         for line in f:
+#             if '=' in line:
+#                 (key, val) = line.split('=')
+#                 key = key.strip()
+#                 val = ','.join(val.split(',')[:-1])
+#                 confiledict[key] = val
+#
 
 
 def read_cv_file(cv_file):

@@ -282,16 +282,17 @@ def read_conf_line(line):
                 keys_values.append('')
     return keys_values
 
-# def read_conf_file(filename):
-#     conffiledict = dict()
-#     with open(filename, 'r') as f :
-#         for line in f:
-#             if '=' in line:
-#                 (key, val) = line.split('=')
-#                 key = key.strip()
-#                 val = ','.join(val.split(',')[:-1])
-#                 confiledict[key] = val
-#
+
+def read_conf_file(filename):
+    conffiledict = dict()
+    with open(filename, 'r') as f:
+        for line in f:
+            if '&' not in line and '\\' not in line and '=' in line:
+                line_list = read_conf_line(line)
+                for l in line_list:
+                    key, val = l.split('=')
+                    conffiledict[key] = val
+    return conffiledict
 
 
 def read_cv_file(cv_file):

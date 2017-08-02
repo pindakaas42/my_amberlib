@@ -277,6 +277,16 @@ def read_mtmdfile(mtmdfile):
     return mtmddict1, mtmddict2
 
 
+def read_conf_line(line):
+    line = line.strip()
+    line_commalist = line.split(',')
+    for l in line_commalist[::-1]:
+        if '=' not in l:
+            line_commalist[-2] += ','+line_commalist[-1]
+            line_commalist.pop()
+    return line_commalist
+
+
 def read_cv_file(cv_file):
     cv_dict = infilereadin(cv_file)
 

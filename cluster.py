@@ -10,7 +10,11 @@ def compress_traj_pt(trajs, top, targetdir,
     '''cutoff_fraction is the fraction of frames left out at the beginning
     compression = 1 will give no compression'''
     top = pt.load_topology(top)
-    noexttraj = os.path.splitext(os.path.basename(trajs[0]))[0]
+    if type(trajs) == list:
+        name = trajs[0]
+    else:
+        name = trajs
+    noexttraj = os.path.splitext(os.path.basename(name))[0]
     traj = pt.iterload(trajs, top)
     if cutoff_fraction > 1:
         traj = traj[len(traj)/cutoff_fraction::compression]

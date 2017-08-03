@@ -678,11 +678,9 @@ def get_disang_simple(dist1, dist2,
 def get_disang(dist, forceconst, topology, find_atoms):
     dist = str(float(dist))
     forceconst = str(float(forceconst))
-    igr1 = ','
-    igr2 = ','
     atomlist = find_atoms(topology)
-    igr1 = igr1.join(atomlist[0])
-    igr2 = igr2.join(atomlist[1])
+    igr1 = ','.join(atomlist[0])
+    igr2 = ','.join(atomlist[1])
     return get_disang_simple(dist1=dist, dist2=dist,
                              forceconst1=forceconst, forceconst2=forceconst,
                              atoms1=igr1, atoms2=igr2)

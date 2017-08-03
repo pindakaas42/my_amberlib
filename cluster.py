@@ -104,3 +104,32 @@ def cluster_epsilon(trajectory, topology, targetdir, epsilon='3.0',
         f.writelines(trajin)
     os.system('mpirun -np 4 cpptraj.MPI -i '+cpptrajfile)
     os.chdir(nowdir)
+
+def arti_collv(trajs, topology):
+    top = pt.load_topology(topology)
+    traj = pt.iterload(trajs, top)
+    atoms = lib.find_p_atoms_pytraj(topology)
+    mask = '@'+','.join(atoms[0])+' @'+','.join(atoms[1])
+    dist = pt.distance(traj, top=top, mask=mask)
+    bins= np.linspace(min(dist), max(dist), 30)
+    binned = np.digitize(dist, bins)
+    trajs_indxs = dict()
+    trajs_indxs = {i:None for i in binned}
+    for k, val in enumerate(binned):
+        if trajs_indxs[val] is None:
+            trajs_indxs[val] = [k]
+        else:
+            trajs_indxs[val].append(k)
+    return trajs_indxs
+
+def write_arti_collv(trajs, topology):
+    trajs_indxs = arti_collv(trajs, topology)
+    traj = pt.iterload(trajs, topology)
+    for key, val in trajs_indxs.iteritems():
+        pt.write_traj('../art_cluster/window'+str(key)+'.nc',
+                      traj, top=topology, frame_indices=val, overwrite=True)
+    with open('../art_cluster/bins', 'w') as f:
+        i = 0
+        while i+1 < len(bins):
+            f.write(str(bins[i])+' to ' + str(bins[i+1])+' bin '+str(i+1))
+            i += 1

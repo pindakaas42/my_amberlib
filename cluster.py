@@ -110,13 +110,13 @@ def cluster_epsilon(trajectory, topology, targetdir, epsilon='3.0',
     os.chdir(nowdir)
 
 
-def arti_collv(trajs, topology):
+def arti_collv(trajs, topology, windows):
     top = pt.load_topology(topology)
     traj = pt.iterload(trajs, top)
     atoms = lib.find_p_atoms_pytraj(topology)
     mask = '@'+','.join(atoms[0])+' @'+','.join(atoms[1])
     dist = pt.distance(traj, top=top, mask=mask)
-    bins = np.linspace(min(dist), max(dist), 30)
+    bins = np.linspace(min(dist), max(dist), windows)
     binned = np.digitize(dist, bins)
     trajs_indxs = dict()
     trajs_indxs = {i: None for i in binned}
@@ -128,14 +128,17 @@ def arti_collv(trajs, topology):
     return trajs_indxs, bins
 
 
-def write_arti_collv(trajs, topology):
-    trajs_indxs, bins = arti_collv(trajs, topology)
+def write_arti_collv(trajs, topology, trajs_indxs, bins, targetdir):
     traj = pt.iterload(trajs, topology)
     for key, val in trajs_indxs.iteritems():
-        pt.write_traj('../art_cluster/window'+str(key)+'.nc',
+        pt.write_traj(targetdir+'/window'+str(key)+'.nc',
                       traj, top=topology, frame_indices=val, overwrite=True)
-    with open('../art_cluster/bins', 'w') as f:
+    with open(targetdir+'/bins', 'w') as f:
         i = 0
         while i+1 < len(bins):
             f.write(str(bins[i])+' to ' + str(bins[i+1])+' bin '+str(i+1))
             i += 1
+    with open(targetdir+'/traj_placement', 'w') as f:
+        f.write('#frame    bin')
+        for k, i in enumerate(trajs_indxs):
+            f.write(str(k)+'    '+str(i)+'\n')

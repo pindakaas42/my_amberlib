@@ -136,9 +136,16 @@ def write_arti_collv(trajs, topology, trajs_indxs, bins, targetdir):
     with open(targetdir+'/bins', 'w') as f:
         i = 0
         while i+1 < len(bins):
-            f.write(str(bins[i])+' to ' + str(bins[i+1])+' bin '+str(i+1))
+            f.write(str(bins[i])+' to ' + str(bins[i+1])+' bin '+str(i+1)+'\n')
             i += 1
+
+    index_sorted = []
+    for k, i in trajs_indxs.iteritems():
+        for fr in i:
+            index_sorted.append((fr, k))
+    index_sorted = sorted(index_sorted, key=lambda x: x[0])
+
     with open(targetdir+'/traj_placement', 'w') as f:
         f.write('#frame    bin')
-        for k, i in enumerate(trajs_indxs):
-            f.write(str(k)+'    '+str(i)+'\n')
+        for fr, b in index_sorted:
+            f.write(str(fr)+'    '+str(b)+'\n')

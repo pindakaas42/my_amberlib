@@ -283,15 +283,29 @@ def read_conf_line(line):
     return keys_values
 
 
-def read_conf_file(filename):
+def read_conf_file(filename, namespace_token='', namespace_end_token='#end'):
+    '''conffile format #namespace \n var=1,2,3, var2=2 #end if not namecpace
+    tokens are given all variables,
+    that are not in a line with a & or \ are read in  '''
     conffiledict = dict()
+    in_namespace = False
+
     with open(filename, 'r') as f:
         for line in f:
-            if '&' not in line and '\\' not in line and '=' in line:
+            if namespace_token in line:
+                in_namespace = True
+            if namespace_end_token in line:
+                in_namespace = False
+
+            if in_namespace is True:
                 line_list = read_conf_line(line)
-                for l in line_list:
-                    key, val = l.split('=')
-                    conffiledict[key] = val
+                nospesh = '&' not in line and '\\' not in line
+                nospesh = nospesh and '#' not in line
+                if nospesh and '=' in line:
+                    for l in line_list:
+                        key, val = l.split('=')
+                        conffiledict[key] = val
+
     return conffiledict
 
 
